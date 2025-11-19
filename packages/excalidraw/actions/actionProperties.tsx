@@ -107,6 +107,7 @@ import {
   FontSizeMediumIcon,
   FontSizeLargeIcon,
   FontSizeExtraLargeIcon,
+  FontSizeXXLargeIcon,
   EdgeSharpIcon,
   EdgeRoundIcon,
   TextAlignLeftIcon,
@@ -233,8 +234,8 @@ const offsetElementAfterFontResize = (
       prevElement.textAlign === "left"
         ? prevElement.x
         : prevElement.x +
-          (prevElement.width - nextElement.width) /
-            (prevElement.textAlign === "center" ? 2 : 1),
+        (prevElement.width - nextElement.width) /
+        (prevElement.textAlign === "center" ? 2 : 1),
     // centering vertically is non-standard, but for Excalidraw I think
     // it makes sense
     y: prevElement.y + (prevElement.height - nextElement.height) / 2,
@@ -319,8 +320,8 @@ export const actionChangeStrokeColor = register({
           (el) => {
             return hasStrokeColor(el.type)
               ? newElementWith(el, {
-                  strokeColor: value.currentItemStrokeColor,
-                })
+                strokeColor: value.currentItemStrokeColor,
+              })
               : el;
           },
           true,
@@ -459,8 +460,7 @@ export const actionChangeFillStyle = register({
     trackEvent(
       "element",
       "changeFillStyle",
-      `${value} (${
-        app.editorInterface.formFactor === "phone" ? "mobile" : "desktop"
+      `${value} (${app.editorInterface.formFactor === "phone" ? "mobile" : "desktop"
       })`,
     );
     return {
@@ -488,9 +488,8 @@ export const actionChangeFillStyle = register({
             options={[
               {
                 value: "hachure",
-                text: `${
-                  allElementsZigZag ? t("labels.zigzag") : t("labels.hachure")
-                } (${getShortcutKey("Alt-Click")})`,
+                text: `${allElementsZigZag ? t("labels.zigzag") : t("labels.hachure")
+                  } (${getShortcutKey("Alt-Click")})`,
                 icon: allElementsZigZag ? FillZigZagIcon : FillHachureIcon,
                 active: allElementsZigZag ? true : undefined,
                 testId: `fill-hachure`,
@@ -519,8 +518,8 @@ export const actionChangeFillStyle = register({
             onClick={(value, event) => {
               const nextValue =
                 event.altKey &&
-                value === "hachure" &&
-                selectedElements.every((el) => el.fillStyle === "hachure")
+                  value === "hachure" &&
+                  selectedElements.every((el) => el.fillStyle === "hachure")
                   ? "zigzag"
                   : value;
 
@@ -760,6 +759,12 @@ export const actionChangeFontSize = register({
                 text: t("labels.veryLarge"),
                 icon: FontSizeExtraLargeIcon,
                 testId: "fontSize-veryLarge",
+              },
+              {
+                value: 48,
+                text: t("labels.veryVeryLarge"),
+                icon: FontSizeXXLargeIcon,
+                testId: "fontSize-xxl",
               },
             ]}
             value={getFormValue(
@@ -1457,10 +1462,10 @@ export const actionChangeRoundness = register({
           roundness:
             value === "round"
               ? {
-                  type: isUsingAdaptiveRadius(el.type)
-                    ? ROUNDNESS.ADAPTIVE_RADIUS
-                    : ROUNDNESS.PROPORTIONAL_RADIUS,
-                }
+                type: isUsingAdaptiveRadius(el.type)
+                  ? ROUNDNESS.ADAPTIVE_RADIUS
+                  : ROUNDNESS.PROPORTIONAL_RADIUS,
+              }
               : null,
         });
       }),
@@ -1506,8 +1511,8 @@ export const actionChangeRoundness = register({
                 hasLegacyRoundness
                   ? null
                   : element.roundness
-                  ? "round"
-                  : "sharp",
+                    ? "round"
+                    : "sharp",
               (element) =>
                 !isArrowElement(element) && element.hasOwnProperty("roundness"),
               (hasSelection) =>
@@ -1715,8 +1720,8 @@ export const actionChangeArrowType = register({
         roundness:
           value === ARROW_TYPE.round
             ? {
-                type: ROUNDNESS.PROPORTIONAL_RADIUS,
-              }
+              type: ROUNDNESS.PROPORTIONAL_RADIUS,
+            }
             : null,
         elbowed: value === ARROW_TYPE.elbow,
         points:
@@ -1758,28 +1763,28 @@ export const actionChangeArrowType = register({
         const startBinding =
           startElement && newElement.startBinding
             ? {
-                // @ts-ignore TS cannot discern check above
-                ...newElement.startBinding!,
-                ...calculateFixedPointForElbowArrowBinding(
-                  newElement,
-                  startElement,
-                  "start",
-                  elementsMap,
-                ),
-              }
+              // @ts-ignore TS cannot discern check above
+              ...newElement.startBinding!,
+              ...calculateFixedPointForElbowArrowBinding(
+                newElement,
+                startElement,
+                "start",
+                elementsMap,
+              ),
+            }
             : null;
         const endBinding =
           endElement && newElement.endBinding
             ? {
-                // @ts-ignore TS cannot discern check above
-                ...newElement.endBinding,
-                ...calculateFixedPointForElbowArrowBinding(
-                  newElement,
-                  endElement,
-                  "end",
-                  elementsMap,
-                ),
-              }
+              // @ts-ignore TS cannot discern check above
+              ...newElement.endBinding,
+              ...calculateFixedPointForElbowArrowBinding(
+                newElement,
+                endElement,
+                "end",
+                elementsMap,
+              ),
+            }
             : null;
 
         newElement = {
@@ -1878,8 +1883,8 @@ export const actionChangeArrowType = register({
                   return element.elbowed
                     ? ARROW_TYPE.elbow
                     : element.roundness
-                    ? ARROW_TYPE.round
-                    : ARROW_TYPE.sharp;
+                      ? ARROW_TYPE.round
+                      : ARROW_TYPE.sharp;
                 }
 
                 return null;
