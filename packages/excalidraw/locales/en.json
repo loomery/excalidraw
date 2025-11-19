@@ -64,6 +64,7 @@
     "medium": "Medium",
     "large": "Large",
     "veryLarge": "Very large",
+    "veryVeryLarge": "Very Very Large",
     "solid": "Solid",
     "hachure": "Hachure",
     "zigzag": "Zigzag",
@@ -622,7 +623,8 @@
     },
     "sceneFonts": "In this scene",
     "availableFonts": "Available fonts",
-    "empty": "No fonts found"
+    "empty": "No fonts found",
+    "xxl": "XXL"
   },
   "userList": {
     "empty": "No users found",

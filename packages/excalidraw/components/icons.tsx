@@ -1547,6 +1547,22 @@ export const FontSizeExtraLargeIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+export const FontSizeXXLargeIcon = createIcon(
+  <text
+    x="50%"
+    y="60%"
+    textAnchor="middle"
+    dominantBaseline="middle"
+    fontSize="13"
+    fontWeight="bold"
+    fill="currentColor"
+    fontFamily="sans-serif"
+  >
+    XXL
+  </text>,
+  32
+);
+
 export const fontSizeIcon = createIcon(
   <g strokeWidth={1.25}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
