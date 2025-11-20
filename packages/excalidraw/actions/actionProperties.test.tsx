@@ -1,4 +1,4 @@
-import { queryByTestId } from "@testing-library/react";
+import { queryByTestId, fireEvent } from "@testing-library/react";
 
 import {
   COLOR_PALETTE,
@@ -168,6 +168,27 @@ describe("element locking", () => {
       expect(queryByTestId(document.body, `font-family-code`)).toHaveClass(
         "active",
       );
+    });
+
+    it("should update font size via slider", () => {
+      const text = API.createElement({
+        type: "text",
+        fontSize: 20,
+      });
+      API.setElements([text]);
+      API.setSelectedElements([text]);
+
+      const slider = document.querySelector(
+        "input[type='range'][min='10'][max='100']",
+      ) as HTMLInputElement;
+      expect(slider).not.toBeNull();
+      expect(slider.value).toBe("20");
+
+      // Simulate change
+      fireEvent.change(slider, { target: { value: "40" } });
+
+      const updatedText = API.getElement(text);
+      expect(updatedText.fontSize).toBe(40);
     });
   });
 });

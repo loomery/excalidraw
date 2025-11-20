@@ -171,7 +171,9 @@
     "linkToElement": "Link all'oggetto",
     "wrapSelectionInFrame": "Avvolgi la selezione nella cornice",
     "tab": "",
-    "shapeSwitch": ""
+    "shapeSwitch": "",
+    "fontSizeSlider": "Dimensione font",
+    "fontSizeSliderValue": "{{size}} px"
   },
   "elementLink": {
     "title": "Link all'oggetto",

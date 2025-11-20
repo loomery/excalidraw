@@ -103,10 +103,6 @@ import {
   StrokeWidthBaseIcon,
   StrokeWidthBoldIcon,
   StrokeWidthExtraBoldIcon,
-  FontSizeSmallIcon,
-  FontSizeMediumIcon,
-  FontSizeLargeIcon,
-  FontSizeExtraLargeIcon,
   EdgeSharpIcon,
   EdgeRoundIcon,
   TextAlignLeftIcon,
@@ -729,75 +725,53 @@ export const actionChangeFontSize = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => {
     const { isCompact } = getStylesPanelInfo(app);
+    const currentFontSize = getFormValue(
+      elements,
+      app,
+      (element) => {
+        if (isTextElement(element)) {
+          return element.fontSize;
+        }
+        const boundTextElement = getBoundTextElement(
+          element,
+          app.scene.getNonDeletedElementsMap(),
+        );
+        if (boundTextElement) {
+          return boundTextElement.fontSize;
+        }
+        return null;
+      },
+      (element) =>
+        isTextElement(element) ||
+        getBoundTextElement(element, app.scene.getNonDeletedElementsMap()) !==
+          null,
+      (hasSelection) =>
+        hasSelection ? null : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+    );
 
     return (
       <fieldset>
         <legend>{t("labels.fontSize")}</legend>
-        <div className="buttonList">
-          <RadioSelection
-            group="font-size"
-            options={[
-              {
-                value: 16,
-                text: t("labels.small"),
-                icon: FontSizeSmallIcon,
-                testId: "fontSize-small",
-              },
-              {
-                value: 20,
-                text: t("labels.medium"),
-                icon: FontSizeMediumIcon,
-                testId: "fontSize-medium",
-              },
-              {
-                value: 28,
-                text: t("labels.large"),
-                icon: FontSizeLargeIcon,
-                testId: "fontSize-large",
-              },
-              {
-                value: 36,
-                text: t("labels.veryLarge"),
-                icon: FontSizeExtraLargeIcon,
-                testId: "fontSize-veryLarge",
-              },
-            ]}
-            value={getFormValue(
-              elements,
-              app,
-              (element) => {
-                if (isTextElement(element)) {
-                  return element.fontSize;
-                }
-                const boundTextElement = getBoundTextElement(
-                  element,
-                  app.scene.getNonDeletedElementsMap(),
-                );
-                if (boundTextElement) {
-                  return boundTextElement.fontSize;
-                }
-                return null;
-              },
-              (element) =>
-                isTextElement(element) ||
-                getBoundTextElement(
-                  element,
-                  app.scene.getNonDeletedElementsMap(),
-                ) !== null,
-              (hasSelection) =>
-                hasSelection
-                  ? null
-                  : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
-            )}
-            onChange={(value) => {
+        <div className="range-wrapper" style={{ padding: "0 10px" }}>
+          <input
+            type="range"
+            min="10"
+            max="100"
+            step="1"
+            value={currentFontSize || DEFAULT_FONT_SIZE}
+            onChange={(event) => {
               withCaretPositionPreservation(
-                () => updateData(value),
+                () => updateData(+event.target.value),
                 isCompact,
                 !!appState.editingTextElement,
                 data?.onPreventClose,
               );
             }}
+            style={{ width: "100%" }}
           />
+          <div style={{ textAlign: "center", marginTop: "5px" }}>
+            {currentFontSize || DEFAULT_FONT_SIZE}px
+          </div>
         </div>
       </fieldset>
     );
