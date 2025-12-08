@@ -1,0 +1,10 @@
+.circular-color-picker-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+}
+
+.circular-color-picker {
+  touch-action: none;
+}

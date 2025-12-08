@@ -177,7 +177,17 @@ export const Picker = React.forwardRef(
                 colors={customColors}
                 color={color}
                 label={t("colorPicker.mostUsedCustomColors")}
-                onChange={onChange}
+                onChange={(c) => {
+                  const data: any = { openPopup: null };
+                  if (type === "elementStroke") {
+                    data.currentItemStrokeColor = c;
+                  } else if (type === "elementBackground") {
+                    data.currentItemBackgroundColor = c;
+                  } else if (type === "canvasBackground") {
+                    data.viewBackgroundColor = c;
+                  }
+                  updateData(data);
+                }}
               />
             </div>
           )}
