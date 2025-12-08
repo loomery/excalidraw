@@ -26,6 +26,7 @@ import {
   temporarilyDisableTextEditorBlur,
 } from "../../hooks/useTextEditorFocus";
 
+import { CircularColorPicker } from "./CircularColorPicker";
 import { ColorInput } from "./ColorInput";
 import { Picker } from "./Picker";
 import PickerHeading from "./PickerHeading";
@@ -126,6 +127,24 @@ const ColorPickerPopupContent = ({
   const focusPickerContent = () => {
     colorPickerContentRef.current?.focus();
   };
+
+  if (appState.activeTool.type === "freedraw" && type === "elementStroke") {
+    return (
+      <PropertiesPopover
+        container={container}
+        style={{ maxWidth: "15rem" }}
+        preventAutoFocusOnTouch={!!appState.editingTextElement}
+        onClose={() => {
+          if (getOpenPopup() === type) {
+            updateData({ openPopup: null });
+          }
+          setActiveColorPickerSection(null);
+        }}
+      >
+        <CircularColorPicker color={color} onChange={onChange} />
+      </PropertiesPopover>
+    );
+  }
 
   return (
     <PropertiesPopover
@@ -330,7 +349,17 @@ export const ColorPicker = ({
         {!isCompactMode && (
           <TopPicks
             activeColor={color}
-            onChange={onChange}
+            onChange={(c) => {
+              const data: any = { openPopup: null };
+              if (type === "elementStroke") {
+                data.currentItemStrokeColor = c;
+              } else if (type === "elementBackground") {
+                data.currentItemBackgroundColor = c;
+              } else if (type === "canvasBackground") {
+                data.viewBackgroundColor = c;
+              }
+              updateData(data);
+            }}
             type={type}
             topPicks={topPicks}
           />
