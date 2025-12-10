@@ -459,6 +459,7 @@ import type {
   Gesture,
   GestureEvent,
   LibraryItems,
+  PointerCoords,
   PointerDownState,
   SceneData,
   FrameNameBoundsCache,
@@ -1564,7 +1565,8 @@ class App extends React.Component<AppProps, AppState> {
           this.state.newElement ||
           this.state.selectedElementsAreBeingDragged ||
           this.state.resizingElement ||
-          (this.state.activeTool.type === "laser" &&
+          ((this.state.activeTool.type === "laser" ||
+            this.isSprayToolActive()) &&
             // technically we can just test on this once we make it more safe
             this.state.cursorButton === "down");
 
@@ -4661,6 +4663,15 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (event.key === KEYS.J && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
+        if (this.isSprayToolActive()) {
+          this.setActiveTool({ type: this.state.preferredSelectionTool.type });
+        } else {
+          this.setActiveTool({ type: "spray" });
+        }
+        return;
+      }
+
       if (
         event[KEYS.CTRL_OR_CMD] &&
         (event.key === KEYS.BACKSPACE || event.key === KEYS.DELETE)
@@ -6834,13 +6845,15 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.lastCoords.x,
         pointerDownState.lastCoords.y,
       );
+    } else if (this.isSprayToolActive()) {
+      this.emitSprayParticles(pointerDownState.lastCoords);
     } else if (
       this.state.activeTool.type !== "eraser" &&
       this.state.activeTool.type !== "hand" &&
       this.state.activeTool.type !== "image"
     ) {
       this.createGenericElementOnPointerDown(
-        this.state.activeTool.type,
+        this.state.activeTool.type as ExcalidrawGenericElement["type"],
         pointerDownState,
       );
     }
@@ -6872,7 +6885,11 @@ class App extends React.Component<AppProps, AppState> {
       onPointerUp(_event || event.nativeEvent),
     );
 
-    if (!this.state.viewModeEnabled || this.state.activeTool.type === "laser") {
+    if (
+      !this.state.viewModeEnabled ||
+      this.state.activeTool.type === "laser" ||
+      this.isSprayToolActive()
+    ) {
       window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
       window.addEventListener(EVENT.POINTER_UP, onPointerUp);
       window.addEventListener(EVENT.KEYDOWN, onKeyDown);
@@ -8162,6 +8179,58 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private isSprayToolActive = () =>
+    (this.state.activeTool.type as ToolType | "spray") === TOOL_TYPE.spray;
+
+  private emitSprayParticles = (coords: PointerCoords) => {
+    const { sprayPointer, currentItemOpacity } = this.state;
+    const { size, intensity, color } = sprayPointer;
+
+    if (size <= 0 || intensity <= 0) {
+      return;
+    }
+
+    const particlesCount = Math.max(1, Math.round(intensity));
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords(coords);
+    const elements: ExcalidrawElement[] = [];
+    const baseColor = color || this.state.currentItemStrokeColor;
+    const TWO_PI = Math.PI * 2;
+
+    for (let index = 0; index < particlesCount; index++) {
+      const angle = Math.random() * TWO_PI;
+      const distance = Math.random() * size;
+      const centerX = coords.x + Math.cos(angle) * distance;
+      const centerY = coords.y + Math.sin(angle) * distance;
+      const radius = Math.max(0.5, size * 0.05 + Math.random() * size * 0.05);
+      const diameter = radius * 2;
+
+      const particle = newElement({
+        type: "ellipse",
+        x: centerX - radius,
+        y: centerY - radius,
+        width: diameter,
+        height: diameter,
+        strokeColor: baseColor,
+        backgroundColor: baseColor,
+        fillStyle: "solid",
+        strokeStyle: "solid",
+        strokeWidth: 0,
+        roughness: 0,
+        opacity: currentItemOpacity,
+        roundness: null,
+        locked: false,
+        frameId: topLayerFrame ? topLayerFrame.id : null,
+      });
+
+      elements.push(particle);
+    }
+
+    if (elements.length) {
+      this.scene.insertElements(elements);
+      this.store.scheduleCapture();
+    }
+  };
+
   private createFrameElementOnPointerDown = (
     pointerDownState: PointerDownState,
     type: Extract<ToolType, "frame" | "magicframe">,
@@ -8367,6 +8436,8 @@ class App extends React.Component<AppProps, AppState> {
 
       if (this.state.activeTool.type === "laser") {
         this.laserTrails.addPointToPath(pointerCoords.x, pointerCoords.y);
+      } else if (this.isSprayToolActive()) {
+        this.emitSprayParticles(pointerCoords);
       }
 
       const [gridX, gridY] = getGridPoint(
@@ -11374,11 +11445,22 @@ class App extends React.Component<AppProps, AppState> {
       // sometimes the pointer goes off screen
     }
 
+    let tool: CollaboratorPointer["tool"] = "pointer";
+    if (this.state.activeTool.type === "laser") {
+      tool = "laser";
+    } else if (this.isSprayToolActive()) {
+      tool = "spray";
+    }
+
     const pointer: CollaboratorPointer = {
       x: sceneX,
       y: sceneY,
-      tool: this.state.activeTool.type === "laser" ? "laser" : "pointer",
+      tool,
     };
+
+    if (tool === "spray") {
+      pointer.laserColor = this.state.sprayPointer.color;
+    }
 
     this.props.onPointerUpdate?.({
       pointer,

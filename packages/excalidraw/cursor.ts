@@ -3,6 +3,7 @@ import OpenColor from "open-color";
 import { CURSOR_TYPE, MIME_TYPES, THEME } from "@excalidraw/common";
 
 import { isHandToolActive, isEraserActive } from "./appState";
+import { MAX_SPRAY_SIZE, MIN_SPRAY_SIZE } from "./constants";
 
 import type { AppState, DataURL } from "./types";
 
@@ -38,6 +39,16 @@ export const setCursor = (
 
 let eraserCanvasCache: any;
 let previewDataURL: string;
+
+type SprayCursorCache = {
+  dataURL: DataURL;
+  hotspot: number;
+  theme: AppState["theme"];
+  size: number;
+};
+
+let sprayCursorCache: SprayCursorCache | null = null;
+
 export const setEraserCursor = (
   interactiveCanvas: HTMLCanvasElement | null,
   theme: AppState["theme"],
@@ -78,9 +89,76 @@ export const setEraserCursor = (
   );
 };
 
+const clampSpraySize = (size: number) =>
+  Math.max(MIN_SPRAY_SIZE, Math.min(MAX_SPRAY_SIZE, size));
+
+const createSprayCursor = (
+  theme: AppState["theme"],
+  size: number,
+): { dataURL: DataURL; hotspot: number } => {
+  const radius = clampSpraySize(size);
+  const padding = 8;
+  const diameter = radius * 2 + padding;
+  const canvasSize = Math.min(256, Math.max(32, Math.round(diameter)));
+  const canvas = document.createElement("canvas");
+  canvas.width = canvasSize;
+  canvas.height = canvasSize;
+  const context = canvas.getContext("2d")!;
+  const center = canvasSize / 2;
+  const strokeColor = theme === THEME.DARK ? OpenColor.white : OpenColor.black;
+
+  context.lineWidth = 1.5;
+  context.setLineDash([4, 6]);
+  context.beginPath();
+  context.arc(center, center, Math.max(6, radius), 0, 2 * Math.PI);
+  context.strokeStyle = strokeColor;
+  context.stroke();
+
+  context.setLineDash([]);
+  context.beginPath();
+  context.arc(center, center, 2, 0, 2 * Math.PI);
+  context.fillStyle = strokeColor;
+  context.fill();
+
+  return {
+    dataURL: canvas.toDataURL() as DataURL,
+    hotspot: center,
+  };
+};
+
+const setSprayCursor = (
+  interactiveCanvas: HTMLCanvasElement | null,
+  theme: AppState["theme"],
+  size: number,
+) => {
+  if (!interactiveCanvas) {
+    return;
+  }
+
+  const normalizedSize = clampSpraySize(size);
+  if (
+    !sprayCursorCache ||
+    sprayCursorCache.theme !== theme ||
+    sprayCursorCache.size !== normalizedSize
+  ) {
+    const cursor = createSprayCursor(theme, normalizedSize);
+    sprayCursorCache = {
+      dataURL: cursor.dataURL,
+      hotspot: cursor.hotspot,
+      theme,
+      size: normalizedSize,
+    };
+  }
+
+  setCursor(
+    interactiveCanvas,
+    `url(${sprayCursorCache.dataURL}) ${sprayCursorCache.hotspot} ${sprayCursorCache.hotspot}, auto`,
+  );
+};
+
 export const setCursorForShape = (
   interactiveCanvas: HTMLCanvasElement | null,
-  appState: Pick<AppState, "activeTool" | "theme">,
+  appState: Pick<AppState, "activeTool" | "theme" | "sprayPointer">,
 ) => {
   if (!interactiveCanvas) {
     return;
@@ -100,6 +178,12 @@ export const setCursorForShape = (
         ? laserPointerCursorDataURL_lightMode
         : laserPointerCursorDataURL_darkMode;
     interactiveCanvas.style.cursor = `url(${url}), auto`;
+  } else if (appState.activeTool.type === "spray") {
+    setSprayCursor(
+      interactiveCanvas,
+      appState.theme,
+      appState.sprayPointer.size,
+    );
   } else if (!["image", "custom"].includes(appState.activeTool.type)) {
     interactiveCanvas.style.cursor = CURSOR_TYPE.CROSSHAIR;
   } else if (appState.activeTool.type !== "image") {

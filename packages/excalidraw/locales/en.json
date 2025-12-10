@@ -310,10 +310,16 @@
     "magicframe": "Wireframe to code",
     "embeddable": "Web Embed",
     "laser": "Laser pointer",
+    "spray": "Spray pointer",
     "hand": "Hand (panning tool)",
     "extraTools": "More tools",
     "mermaidToExcalidraw": "Mermaid to Excalidraw",
     "convertElementType": "Toggle shape type"
+  },
+  "spray": {
+    "size": "Spray radius",
+    "intensity": "Intensity",
+    "color": "Color"
   },
   "element": {
     "rectangle": "Rectangle",

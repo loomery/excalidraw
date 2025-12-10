@@ -91,7 +91,7 @@ export type Collaborator = Readonly<{
 export type CollaboratorPointer = {
   x: number;
   y: number;
-  tool: "pointer" | "laser";
+  tool: "pointer" | "laser" | "spray";
   /**
    * Whether to render cursor + username. Useful when you only want to render
    * laser trail.
@@ -105,6 +105,12 @@ export type CollaboratorPointer = {
    * @default string collaborator's cursor color
    */
   laserColor?: string;
+};
+
+export type SprayPointerSettings = {
+  size: number;
+  intensity: number;
+  color: string;
 };
 
 export type DataURL = string & { _brand: "DataURL" };
@@ -155,7 +161,8 @@ export type ToolType =
   | "frame"
   | "magicframe"
   | "embeddable"
-  | "laser";
+  | "laser"
+  | "spray";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
@@ -323,6 +330,7 @@ export interface AppState {
   };
   penMode: boolean;
   penDetected: boolean;
+  sprayPointer: SprayPointerSettings;
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
@@ -548,7 +556,7 @@ export interface ExcalidrawProps {
   excalidrawAPI?: (api: ExcalidrawImperativeAPI) => void;
   isCollaborating?: boolean;
   onPointerUpdate?: (payload: {
-    pointer: { x: number; y: number; tool: "pointer" | "laser" };
+    pointer: { x: number; y: number; tool: "pointer" | "laser" | "spray" };
     button: "down" | "up";
     pointersMap: Gesture["pointers"];
   }) => void;

@@ -1894,6 +1894,18 @@ export const laserPointerToolIcon = createIcon(
   20,
 );
 
+export const sprayPointerToolIcon = createIcon(
+  <g fill="currentColor" stroke="currentColor" strokeWidth="1">
+    <path d="M4.5 14.5 8.8 19.2 17.2 5.2 12.8 2z" />
+    <circle cx="15.5" cy="3.5" r="0.9" />
+    <circle cx="18.2" cy="5.1" r="0.65" />
+    <circle cx="16.8" cy="6.7" r="0.5" />
+    <circle cx="18.7" cy="7.7" r="0.45" />
+    <circle cx="17.2" cy="2.3" r="0.5" />
+  </g>,
+  tablerIconProps,
+);
+
 export const MagicIcon = createIcon(
   <g stroke="currentColor" fill="none">
     <path stroke="none" d="M0 0h24v24H0z" />

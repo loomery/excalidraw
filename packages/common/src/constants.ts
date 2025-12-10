@@ -24,6 +24,7 @@ export const ELEMENT_TRANSLATE_AMOUNT = 1;
 export const TEXT_TO_CENTER_SNAP_THRESHOLD = 30;
 export const SHIFT_LOCKING_ANGLE = Math.PI / 12;
 export const DEFAULT_LASER_COLOR = "red";
+export const DEFAULT_SPRAY_COLOR = "#2563eb";
 export const CURSOR_TYPE = {
   TEXT: "text",
   CROSSHAIR: "crosshair",
@@ -453,6 +454,7 @@ export const TOOL_TYPE = {
   magicframe: "magicframe",
   embeddable: "embeddable",
   laser: "laser",
+  spray: "spray",
 } as const;
 
 export const EDITOR_LS_KEYS = {
