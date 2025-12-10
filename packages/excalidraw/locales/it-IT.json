@@ -310,10 +310,16 @@
     "magicframe": "Dal wireframe al codice",
     "embeddable": "Incorporamento Web",
     "laser": "Puntatore laser",
+    "spray": "Puntatore spray",
     "hand": "Mano (strumento di panoramica)",
     "extraTools": "Altri strumenti",
     "mermaidToExcalidraw": "Da Mermaid a Excalidraw",
     "convertElementType": ""
+  },
+  "spray": {
+    "size": "Raggio spray",
+    "intensity": "Intensità",
+    "color": "Colore"
   },
   "element": {
     "rectangle": "Rettangolo",

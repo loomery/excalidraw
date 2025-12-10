@@ -1,0 +1,46 @@
+.SprayPointerControl {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ToolIcon__spray-settings-trigger {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.SprayPointerMenu__dropdown {
+  padding: 0.5rem 0.75rem;
+}
+
+.SprayPointerMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 200px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    input[type="color"] {
+      border: none;
+      width: 100%;
+      height: 32px;
+      background: transparent;
+      padding: 0;
+    }
+  }
+}
+
+.SprayPointerMenu__value {
+  font-size: 0.75rem;
+  opacity: 0.75;
+}

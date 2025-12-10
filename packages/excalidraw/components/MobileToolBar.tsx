@@ -31,6 +31,7 @@ import {
   frameToolIcon,
   EmbedIcon,
   laserPointerToolIcon,
+  sprayPointerToolIcon,
   LassoIcon,
   mermaidLogoIcon,
   MagicIcon,
@@ -121,6 +122,7 @@ export const MobileToolBar = ({
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
+  const sprayToolSelected = activeTool.type === "spray";
   const embeddableToolSelected = activeTool.type === "embeddable";
 
   const { TTDDialogTriggerTunnel } = useTunnels();
@@ -160,6 +162,7 @@ export const MobileToolBar = ({
     "frame",
     "embeddable",
     "laser",
+    "spray",
     "magicframe",
   ].filter((tool) => {
     if (showTextToolOutside && tool === "text") {
@@ -185,6 +188,8 @@ export const MobileToolBar = ({
       ? EmbedIcon
       : activeTool.type === "laser"
       ? laserPointerToolIcon
+      : activeTool.type === "spray"
+      ? sprayPointerToolIcon
       : activeTool.type === "magicframe"
       ? MagicIcon
       : extraToolsIcon
@@ -453,6 +458,15 @@ export const MobileToolBar = ({
             shortcut={KEYS.K.toLocaleUpperCase()}
           >
             {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "spray" })}
+            icon={sprayPointerToolIcon}
+            data-testid="toolbar-spray"
+            selected={sprayToolSelected}
+            shortcut={KEYS.J.toLocaleUpperCase()}
+          >
+            {t("toolBar.spray")}
           </DropdownMenu.Item>
           <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
             Generate

@@ -72,6 +72,7 @@ import {
   frameToolIcon,
   mermaidLogoIcon,
   laserPointerToolIcon,
+  sprayPointerToolIcon,
   MagicIcon,
   LassoIcon,
   sharpArrowIcon,
@@ -1069,6 +1070,7 @@ export const ShapesSwitcher = ({
 
   const frameToolSelected = activeTool.type === "frame";
   const laserToolSelected = activeTool.type === "laser";
+  const sprayToolSelected = activeTool.type === "spray";
   const lassoToolSelected =
     isFullStylesPanel &&
     activeTool.type === "lasso" &&
@@ -1185,6 +1187,7 @@ export const ShapesSwitcher = ({
               frameToolSelected ||
               embeddableToolSelected ||
               lassoToolSelected ||
+              sprayToolSelected ||
               // in collab we're already highlighting the laser button
               // outside toolbar, so let's not highlight extra-tools button
               // on top of it
@@ -1200,6 +1203,8 @@ export const ShapesSwitcher = ({
             ? frameToolIcon
             : embeddableToolSelected
             ? EmbedIcon
+            : sprayToolSelected
+            ? sprayPointerToolIcon
             : laserToolSelected && !app.props.isCollaborating
             ? laserPointerToolIcon
             : lassoToolSelected
@@ -1236,6 +1241,15 @@ export const ShapesSwitcher = ({
             shortcut={KEYS.K.toLocaleUpperCase()}
           >
             {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "spray" })}
+            icon={sprayPointerToolIcon}
+            data-testid="toolbar-spray"
+            selected={sprayToolSelected}
+            shortcut={KEYS.J.toLocaleUpperCase()}
+          >
+            {t("toolBar.spray")}
           </DropdownMenu.Item>
           {isFullStylesPanel && (
             <DropdownMenu.Item

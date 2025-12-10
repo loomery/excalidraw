@@ -11,7 +11,10 @@ import {
   THEME,
   DEFAULT_GRID_STEP,
   isTestEnv,
+  DEFAULT_SPRAY_COLOR,
 } from "@excalidraw/common";
+
+import { DEFAULT_SPRAY_INTENSITY, DEFAULT_SPRAY_SIZE } from "./constants";
 
 import type { AppState, NormalizedZoomValue } from "./types";
 
@@ -61,6 +64,11 @@ export const getDefaultAppState = (): Omit<
     },
     penMode: false,
     penDetected: false,
+    sprayPointer: {
+      size: DEFAULT_SPRAY_SIZE,
+      intensity: DEFAULT_SPRAY_INTENSITY,
+      color: DEFAULT_SPRAY_COLOR,
+    },
     errorMessage: null,
     exportBackground: true,
     exportScale: defaultExportScale,
@@ -182,6 +190,7 @@ const APP_STATE_STORAGE_CONF = (<
   preferredSelectionTool: { browser: true, export: false, server: false },
   penMode: { browser: true, export: false, server: false },
   penDetected: { browser: true, export: false, server: false },
+  sprayPointer: { browser: true, export: false, server: false },
   errorMessage: { browser: false, export: false, server: false },
   exportBackground: { browser: true, export: false, server: false },
   exportEmbedScene: { browser: true, export: false, server: false },
