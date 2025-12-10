@@ -147,6 +147,9 @@ import { register } from "./register";
 import type { AppClassProperties, AppState, Primitive } from "../types";
 
 const FONT_SIZE_RELATIVE_INCREASE_STEP = 0.1;
+const FONT_SIZE_SLIDER_MIN = 8;
+const FONT_SIZE_SLIDER_MAX = 96;
+const FONT_SIZE_SLIDER_STEP = 1;
 
 const getStylesPanelInfo = (app: AppClassProperties) => {
   const stylesPanelMode = deriveStylesPanelMode(app.editorInterface);
@@ -730,6 +733,44 @@ export const actionChangeFontSize = register({
   PanelComponent: ({ elements, appState, updateData, app, data }) => {
     const { isCompact } = getStylesPanelInfo(app);
 
+    const fontSizeValue = getFormValue(
+      elements,
+      app,
+      (element) => {
+        if (isTextElement(element)) {
+          return element.fontSize;
+        }
+        const boundTextElement = getBoundTextElement(
+          element,
+          app.scene.getNonDeletedElementsMap(),
+        );
+        if (boundTextElement) {
+          return boundTextElement.fontSize;
+        }
+        return null;
+      },
+      (element) =>
+        isTextElement(element) ||
+        getBoundTextElement(element, app.scene.getNonDeletedElementsMap()) !==
+          null,
+      (hasSelection) =>
+        hasSelection ? null : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+    );
+
+    const sliderValue =
+      typeof fontSizeValue === "number"
+        ? fontSizeValue
+        : appState.currentItemFontSize || DEFAULT_FONT_SIZE;
+
+    const applyFontSizeChange = (nextValue: number) => {
+      withCaretPositionPreservation(
+        () => updateData(nextValue),
+        isCompact,
+        !!appState.editingTextElement,
+        data?.onPreventClose,
+      );
+    };
+
     return (
       <fieldset>
         <legend>{t("labels.fontSize")}</legend>
@@ -762,42 +803,34 @@ export const actionChangeFontSize = register({
                 testId: "fontSize-veryLarge",
               },
             ]}
-            value={getFormValue(
-              elements,
-              app,
-              (element) => {
-                if (isTextElement(element)) {
-                  return element.fontSize;
-                }
-                const boundTextElement = getBoundTextElement(
-                  element,
-                  app.scene.getNonDeletedElementsMap(),
-                );
-                if (boundTextElement) {
-                  return boundTextElement.fontSize;
-                }
-                return null;
-              },
-              (element) =>
-                isTextElement(element) ||
-                getBoundTextElement(
-                  element,
-                  app.scene.getNonDeletedElementsMap(),
-                ) !== null,
-              (hasSelection) =>
-                hasSelection
-                  ? null
-                  : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
-            )}
-            onChange={(value) => {
-              withCaretPositionPreservation(
-                () => updateData(value),
-                isCompact,
-                !!appState.editingTextElement,
-                data?.onPreventClose,
-              );
-            }}
+            value={fontSizeValue}
+            onChange={applyFontSizeChange}
           />
+        </div>
+        <div className="font-size-slider" style={{ marginTop: 12 }}>
+          <div className="range-wrapper" style={{ paddingBottom: 6 }}>
+            <input
+              className="range-input"
+              type="range"
+              min={FONT_SIZE_SLIDER_MIN}
+              max={FONT_SIZE_SLIDER_MAX}
+              step={FONT_SIZE_SLIDER_STEP}
+              value={sliderValue}
+              onChange={(event) =>
+                applyFontSizeChange(Number(event.target.value))
+              }
+              data-testid="fontSize-slider"
+            />
+          </div>
+          <div
+            style={{
+              textAlign: "right",
+              fontSize: 12,
+              color: "var(--text-primary-color)",
+            }}
+          >
+            {sliderValue}px
+          </div>
         </div>
       </fieldset>
     );
