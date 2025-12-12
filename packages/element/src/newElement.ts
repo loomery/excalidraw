@@ -38,6 +38,7 @@ import type {
   VerticalAlign,
   Arrowhead,
   ExcalidrawFreeDrawElement,
+  ExcalidrawSprayElement,
   FontFamilyValues,
   ExcalidrawTextContainer,
   ExcalidrawFrameElement,
@@ -452,6 +453,21 @@ export const newFreeDrawElement = (
     points: opts.points || [],
     pressures: opts.pressures || [],
     simulatePressure: opts.simulatePressure,
+    lastCommittedPoint: null,
+  };
+};
+
+export const newSprayElement = (
+  opts: {
+    type: "spray";
+    points?: ExcalidrawSprayElement["points"];
+    spraySize?: number;
+  } & ElementConstructorOpts,
+): NonDeleted<ExcalidrawSprayElement> => {
+  return {
+    ..._newElementBase<ExcalidrawSprayElement>(opts.type, opts),
+    points: opts.points || [],
+    spraySize: opts.spraySize || 20,
     lastCommittedPoint: null,
   };
 };

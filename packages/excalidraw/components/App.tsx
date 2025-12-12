@@ -63,6 +63,7 @@ import {
   normalizeLink,
   toValidURL,
   getGridPoint,
+  getSizeFromPoints,
   getLineHeight,
   debounce,
   distance,
@@ -123,6 +124,7 @@ import {
   newElementWith,
   newFrameElement,
   newFreeDrawElement,
+  newSprayElement,
   newEmbeddableElement,
   newMagicFrameElement,
   newIframeElement,
@@ -247,6 +249,7 @@ import type { LocalPoint, Radians } from "@excalidraw/math";
 import type {
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawSprayElement,
   ExcalidrawGenericElement,
   ExcalidrawLinearElement,
   ExcalidrawTextElement,
@@ -6819,6 +6822,12 @@ class App extends React.Component<AppProps, AppState> {
         this.state.activeTool.type,
         pointerDownState,
       );
+    } else if (this.state.activeTool.type === "spray") {
+      this.handleSprayElementOnPointerDown(
+        event,
+        this.state.activeTool.type,
+        pointerDownState,
+      );
     } else if (this.state.activeTool.type === "custom") {
       setCursorForShape(this.interactiveCanvas, this.state);
     } else if (
@@ -7774,6 +7783,75 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({
       newElement: element,
       startBoundElement: boundElement,
+      suggestedBindings: [],
+    });
+  };
+
+  private handleSprayElementOnPointerDown = (
+    event: React.PointerEvent<HTMLElement>,
+    elementType: ExcalidrawSprayElement["type"],
+    pointerDownState: PointerDownState,
+  ) => {
+    const [gridX, gridY] = getGridPoint(
+      pointerDownState.origin.x,
+      pointerDownState.origin.y,
+      null,
+    );
+
+    const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
+      x: gridX,
+      y: gridY,
+    });
+
+    const spraySize = this.state.currentItemStrokeWidth * 5;
+    const initialPoints: LocalPoint[] = [];
+    const particleCount = 5;
+    
+    for (let i = 0; i < particleCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const distance = Math.random() * spraySize;
+      initialPoints.push(pointFrom<LocalPoint>(
+        Math.cos(angle) * distance,
+        Math.sin(angle) * distance,
+      ));
+    }
+
+    const element = newSprayElement({
+      type: elementType,
+      x: gridX,
+      y: gridY,
+      strokeColor: this.state.currentItemStrokeColor,
+      backgroundColor: this.state.currentItemBackgroundColor,
+      fillStyle: this.state.currentItemFillStyle,
+      strokeWidth: this.state.currentItemStrokeWidth,
+      strokeStyle: this.state.currentItemStrokeStyle,
+      roughness: this.state.currentItemRoughness,
+      opacity: this.state.currentItemOpacity,
+      roundness: null,
+      locked: false,
+      frameId: topLayerFrame ? topLayerFrame.id : null,
+      points: initialPoints,
+      spraySize,
+    });
+
+    this.scene.insertElement(element);
+
+    this.setState((prevState) => {
+      const nextSelectedElementIds = {
+        ...prevState.selectedElementIds,
+      };
+      delete nextSelectedElementIds[element.id];
+      return {
+        selectedElementIds: makeNextSelectedElementIds(
+          nextSelectedElementIds,
+          prevState,
+        ),
+      };
+    });
+
+    this.setState({
+      newElement: element,
+      startBoundElement: null,
       suggestedBindings: [],
     });
   };
@@ -8939,6 +9017,41 @@ class App extends React.Component<AppProps, AppState> {
               newElement,
             });
           }
+        } else if (newElement.type === "spray") {
+          const points = newElement.points;
+          const dx = pointerCoords.x - newElement.x;
+          const dy = pointerCoords.y - newElement.y;
+
+          const sprayPoints: LocalPoint[] = [];
+          const particleCount = 10;
+          const radius = newElement.spraySize;
+
+          for (let i = 0; i < particleCount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * radius;
+            const px = dx + Math.cos(angle) * distance;
+            const py = dy + Math.sin(angle) * distance;
+            sprayPoints.push(pointFrom<LocalPoint>(px, py));
+          }
+
+          const allPoints = [...points, ...sprayPoints];
+          const size = getSizeFromPoints(allPoints);
+
+          this.scene.mutateElement(
+            newElement,
+            {
+              points: allPoints,
+              ...size,
+            },
+            {
+              informMutation: false,
+              isDragging: false,
+            },
+          );
+
+          this.setState({
+            newElement,
+          });
         } else if (isLinearElement(newElement)) {
           pointerDownState.drag.hasOccurred = true;
           const points = newElement.points;

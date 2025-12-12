@@ -394,6 +394,20 @@ export const FreedrawIcon = createIcon(
   modifiedTablerIconProps,
 );
 
+export const SprayIcon = createIcon(
+  <g strokeWidth="1.25">
+    <circle cx="10" cy="14" r="3.5" />
+    <circle cx="6" cy="10" r="0.8" fill="currentColor" />
+    <circle cx="8" cy="8" r="0.8" fill="currentColor" />
+    <circle cx="11" cy="9" r="0.8" fill="currentColor" />
+    <circle cx="13" cy="11" r="0.8" fill="currentColor" />
+    <circle cx="14" cy="14" r="0.8" fill="currentColor" />
+    <circle cx="6" cy="14" r="0.8" fill="currentColor" />
+    <circle cx="10" cy="18" r="0.8" fill="currentColor" />
+  </g>,
+  modifiedTablerIconProps,
+);
+
 // tabler-icons: typography
 export const TextIcon = createIcon(
   <g strokeWidth="1.5">

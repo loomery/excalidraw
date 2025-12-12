@@ -14,6 +14,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawBindableElement,
   ExcalidrawFreeDrawElement,
+  ExcalidrawSprayElement,
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
   ExcalidrawTextElementWithContainer,
@@ -103,6 +104,18 @@ export const isFreeDrawElementType = (
   elementType: ExcalidrawElementType,
 ): boolean => {
   return elementType === "freedraw";
+};
+
+export const isSprayElement = (
+  element?: ExcalidrawElement | null,
+): element is ExcalidrawSprayElement => {
+  return element != null && isSprayElementType(element.type);
+};
+
+export const isSprayElementType = (
+  elementType: ExcalidrawElementType,
+): boolean => {
+  return elementType === "spray";
 };
 
 export const isLinearElement = (
@@ -260,6 +273,7 @@ export const isExcalidrawElement = (
     case "ellipse":
     case "arrow":
     case "freedraw":
+    case "spray":
     case "line":
     case "frame":
     case "magicframe":

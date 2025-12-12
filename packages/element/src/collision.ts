@@ -258,6 +258,8 @@ export const intersectElementWithLineSegment = (
     case "freedraw":
     case "arrow":
       return intersectLinearOrFreeDrawWithLineSegment(element, line, onlyFirst);
+    case "spray":
+      return [];
   }
 };
 

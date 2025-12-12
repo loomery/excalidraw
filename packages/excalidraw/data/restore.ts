@@ -97,6 +97,7 @@ export const AllowedExcalidrawActiveTools: Record<
   image: true,
   arrow: true,
   freedraw: true,
+  spray: true,
   eraser: false,
   custom: true,
   frame: true,
@@ -304,6 +305,13 @@ export const restoreElement = (
         lastCommittedPoint: null,
         simulatePressure: element.simulatePressure,
         pressures: element.pressures,
+      });
+    }
+    case "spray": {
+      return restoreElementWithProperties(element, {
+        points: element.points,
+        lastCommittedPoint: null,
+        spraySize: element.spraySize || 20,
       });
     }
     case "image":

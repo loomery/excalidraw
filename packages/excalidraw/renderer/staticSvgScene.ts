@@ -412,6 +412,38 @@ const renderElementToSvg = (
       addToRoot(g || node, element);
       break;
     }
+    case "spray": {
+      const node = svgRoot.ownerDocument!.createElementNS(SVG_NS, "g");
+      if (opacity !== 1) {
+        node.setAttribute("opacity", `${opacity}`);
+      }
+      node.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      for (const point of element.points) {
+        const [x, y] = point;
+        const circle = svgRoot.ownerDocument!.createElementNS(SVG_NS, "circle");
+        circle.setAttribute("cx", `${x}`);
+        circle.setAttribute("cy", `${y}`);
+        circle.setAttribute("r", `${element.strokeWidth / 2}`);
+        circle.setAttribute("fill", element.strokeColor);
+        node.appendChild(circle);
+      }
+
+      const g = maybeWrapNodesInFrameClipPath(
+        element,
+        root,
+        [node],
+        renderConfig.frameRendering,
+        elementsMap,
+      );
+
+      addToRoot(g || node, element);
+      break;
+    }
     case "image": {
       const width = Math.round(element.width);
       const height = Math.round(element.height);

@@ -8,6 +8,7 @@ import {
   ArrowIcon,
   LineIcon,
   FreedrawIcon,
+  SprayIcon,
   TextIcon,
   ImageIcon,
   EraserIcon,
@@ -63,6 +64,13 @@ export const SHAPES = [
     value: "freedraw",
     key: [KEYS.P, KEYS.X],
     numericKey: KEYS["7"],
+    fillable: false,
+  },
+  {
+    icon: SprayIcon,
+    value: "spray",
+    key: KEYS.S,
+    numericKey: null,
     fillable: false,
   },
   {

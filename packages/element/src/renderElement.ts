@@ -111,6 +111,7 @@ const shouldResetImageFilter = (
 const getCanvasPadding = (element: ExcalidrawElement) => {
   switch (element.type) {
     case "freedraw":
+    case "spray":
       return element.strokeWidth * 12;
     case "text":
       return element.fontSize / 2;
@@ -453,6 +454,21 @@ const drawElementOnCanvas = (
       context.restore();
       break;
     }
+    case "spray": {
+      context.save();
+      context.fillStyle = element.strokeColor;
+      context.globalAlpha = element.opacity / 100;
+
+      for (const point of element.points) {
+        const [x, y] = point;
+        context.beginPath();
+        context.arc(x, y, element.strokeWidth / 2, 0, Math.PI * 2);
+        context.fill();
+      }
+
+      context.restore();
+      break;
+    }
     case "image": {
       const img = isInitializedImageElement(element)
         ? renderConfig.imageCache.get(element.fileId)?.image
@@ -787,7 +803,8 @@ export const renderElement = (
       }
       break;
     }
-    case "freedraw": {
+    case "freedraw":
+    case "spray": {
       // TODO investigate if we can do this in situ. Right now we need to call
       // beforehand because math helpers (such as getElementAbsoluteCoords)
       // rely on existing shapes
