@@ -227,6 +227,7 @@
     "lightMode": "Light mode",
     "systemMode": "System mode",
     "zenMode": "Zen mode",
+    "toggle3DMode": "3D mode",
     "objectsSnapMode": "Snap to objects",
     "exitZenMode": "Exit zen mode",
     "cancel": "Cancel",

@@ -294,6 +294,7 @@ import {
   actionToggleGridMode,
   actionToggleStats,
   actionToggleZenMode,
+  actionToggle3DMode,
   actionUnbindText,
   actionBindText,
   actionUngroup,
@@ -426,6 +427,7 @@ import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
 import { StaticCanvas, InteractiveCanvas } from "./canvases";
 import NewElementCanvas from "./canvases/NewElementCanvas";
+import { ThreeDView } from "./ThreeDView";
 import {
   isPointHittingLink,
   isPointHittingLinkIcon,
@@ -1768,81 +1770,94 @@ class App extends React.Component<AppProps, AppState> {
                             }}
                           />
                         )}
-                        <StaticCanvas
-                          canvas={this.canvas}
-                          rc={this.rc}
-                          elementsMap={elementsMap}
-                          allElementsMap={allElementsMap}
-                          visibleElements={visibleElements}
-                          sceneNonce={sceneNonce}
-                          selectionNonce={
-                            this.state.selectionElement?.versionNonce
-                          }
-                          scale={window.devicePixelRatio}
-                          appState={this.state}
-                          renderConfig={{
-                            imageCache: this.imageCache,
-                            isExporting: false,
-                            renderGrid: isGridModeEnabled(this),
-                            canvasBackgroundColor:
-                              this.state.viewBackgroundColor,
-                            embedsValidationStatus: this.embedsValidationStatus,
-                            elementsPendingErasure: this.elementsPendingErasure,
-                            pendingFlowchartNodes:
-                              this.flowChartCreator.pendingNodes,
-                          }}
-                        />
-                        {this.state.newElement && (
-                          <NewElementCanvas
+                        {this.state.threeDModeEnabled ? (
+                          <ThreeDView
+                            elements={this.scene.getNonDeletedElements()}
                             appState={this.state}
-                            scale={window.devicePixelRatio}
+                            width={this.state.width}
+                            height={this.state.height}
+                          />
+                        ) : (
+                          <StaticCanvas
+                            canvas={this.canvas}
                             rc={this.rc}
                             elementsMap={elementsMap}
                             allElementsMap={allElementsMap}
+                            visibleElements={visibleElements}
+                            sceneNonce={sceneNonce}
+                            selectionNonce={
+                              this.state.selectionElement?.versionNonce
+                            }
+                            scale={window.devicePixelRatio}
+                            appState={this.state}
                             renderConfig={{
                               imageCache: this.imageCache,
                               isExporting: false,
-                              renderGrid: false,
+                              renderGrid: isGridModeEnabled(this),
                               canvasBackgroundColor:
                                 this.state.viewBackgroundColor,
-                              embedsValidationStatus:
-                                this.embedsValidationStatus,
-                              elementsPendingErasure:
-                                this.elementsPendingErasure,
-                              pendingFlowchartNodes: null,
+                              embedsValidationStatus: this.embedsValidationStatus,
+                              elementsPendingErasure: this.elementsPendingErasure,
+                              pendingFlowchartNodes:
+                                this.flowChartCreator.pendingNodes,
                             }}
                           />
                         )}
-                        <InteractiveCanvas
-                          app={this}
-                          containerRef={this.excalidrawContainerRef}
-                          canvas={this.interactiveCanvas}
-                          elementsMap={elementsMap}
-                          visibleElements={visibleElements}
-                          allElementsMap={allElementsMap}
-                          selectedElements={selectedElements}
-                          sceneNonce={sceneNonce}
-                          selectionNonce={
-                            this.state.selectionElement?.versionNonce
-                          }
-                          scale={window.devicePixelRatio}
-                          appState={this.state}
-                          renderScrollbars={
-                            this.props.renderScrollbars === true
-                          }
-                          editorInterface={this.editorInterface}
-                          renderInteractiveSceneCallback={
-                            this.renderInteractiveSceneCallback
-                          }
-                          handleCanvasRef={this.handleInteractiveCanvasRef}
-                          onContextMenu={this.handleCanvasContextMenu}
-                          onPointerMove={this.handleCanvasPointerMove}
-                          onPointerUp={this.handleCanvasPointerUp}
-                          onPointerCancel={this.removePointer}
-                          onTouchMove={this.handleTouchMove}
-                          onPointerDown={this.handleCanvasPointerDown}
-                          onDoubleClick={this.handleCanvasDoubleClick}
-                        />
+                        {!this.state.threeDModeEnabled && (
+                          <>
+                            {this.state.newElement && (
+                              <NewElementCanvas
+                                appState={this.state}
+                                scale={window.devicePixelRatio}
+                                rc={this.rc}
+                                elementsMap={elementsMap}
+                                allElementsMap={allElementsMap}
+                                renderConfig={{
+                                  imageCache: this.imageCache,
+                                  isExporting: false,
+                                  renderGrid: false,
+                                  canvasBackgroundColor:
+                                    this.state.viewBackgroundColor,
+                                  embedsValidationStatus:
+                                    this.embedsValidationStatus,
+                                  elementsPendingErasure:
+                                    this.elementsPendingErasure,
+                                  pendingFlowchartNodes: null,
+                                }}
+                              />
+                            )}
+                            <InteractiveCanvas
+                              app={this}
+                              containerRef={this.excalidrawContainerRef}
+                              canvas={this.interactiveCanvas}
+                              elementsMap={elementsMap}
+                              visibleElements={visibleElements}
+                              allElementsMap={allElementsMap}
+                              selectedElements={selectedElements}
+                              sceneNonce={sceneNonce}
+                              selectionNonce={
+                                this.state.selectionElement?.versionNonce
+                              }
+                              scale={window.devicePixelRatio}
+                              appState={this.state}
+                              renderScrollbars={
+                                this.props.renderScrollbars === true
+                              }
+                              editorInterface={this.editorInterface}
+                              renderInteractiveSceneCallback={
+                                this.renderInteractiveSceneCallback
+                              }
+                              handleCanvasRef={this.handleInteractiveCanvasRef}
+                              onContextMenu={this.handleCanvasContextMenu}
+                              onPointerMove={this.handleCanvasPointerMove}
+                              onPointerUp={this.handleCanvasPointerUp}
+                              onPointerCancel={this.removePointer}
+                              onTouchMove={this.handleTouchMove}
+                              onPointerDown={this.handleCanvasPointerDown}
+                              onDoubleClick={this.handleCanvasDoubleClick}
+                            />
+                          </>
+                        )}
                         {this.state.userToFollow && (
                           <FollowMode
                             width={this.state.width}
@@ -11164,6 +11179,7 @@ class App extends React.Component<AppProps, AppState> {
           ...options,
           actionToggleGridMode,
           actionToggleZenMode,
+          actionToggle3DMode,
           actionToggleViewMode,
           actionToggleStats,
         ];
@@ -11182,6 +11198,7 @@ class App extends React.Component<AppProps, AppState> {
         actionToggleGridMode,
         actionToggleObjectsSnapMode,
         actionToggleZenMode,
+        actionToggle3DMode,
         actionToggleViewMode,
         actionToggleStats,
       ];
