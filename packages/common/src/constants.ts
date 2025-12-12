@@ -445,6 +445,7 @@ export const TOOL_TYPE = {
   arrow: "arrow",
   line: "line",
   freedraw: "freedraw",
+  spray: "spray",
   text: "text",
   image: "image",
   eraser: "eraser",

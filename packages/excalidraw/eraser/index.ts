@@ -204,7 +204,7 @@ const eraserTest = (
   const lastPoint = pathSegment[1];
 
   // PERF: Do a quick bounds intersection test first because it's cheap
-  const threshold = isFreeDrawElement(element) ? 15 : element.strokeWidth / 2;
+  const threshold = (isFreeDrawElement(element) || element.type === "spray") ? 15 : element.strokeWidth / 2;
   const segmentBounds = [
     Math.min(pathSegment[0][0], pathSegment[1][0]) - threshold,
     Math.min(pathSegment[0][1], pathSegment[1][1]) - threshold,
@@ -231,6 +231,27 @@ const eraserTest = (
     isPointInElement(lastPoint, element, elementsMap)
   ) {
     return true;
+  }
+
+  // Spray elements are tested for erasure by checking if the eraser path
+  // is within the element bounds
+  if (element.type === "spray") {
+    const tolerance = Math.max(2.25, 5 / zoom);
+    
+    for (const point of element.points) {
+      const globalX = element.x + point[0];
+      const globalY = element.y + point[1];
+      const pointToSegDist = Math.min(
+        Math.hypot(globalX - pathSegment[0][0], globalY - pathSegment[0][1]),
+        Math.hypot(globalX - pathSegment[1][0], globalY - pathSegment[1][1]),
+      );
+      
+      if (pointToSegDist <= tolerance + element.strokeWidth) {
+        return true;
+      }
+    }
+    
+    return false;
   }
 
   // Freedraw elements are tested for erasure by measuring the distance

@@ -225,7 +225,8 @@ export const generateRoughOptions = (
       return options;
     }
     case "line":
-    case "freedraw": {
+    case "freedraw":
+    case "spray": {
       if (isPathALoop(element.points)) {
         options.fillStyle = element.fillStyle;
         options.fill =
@@ -823,7 +824,8 @@ const generateElementShape = (
     case "frame":
     case "magicframe":
     case "text":
-    case "image": {
+    case "image":
+    case "spray": {
       const shape: ElementShapes[typeof element.type] = null;
       // we return (and cache) `null` to make sure we don't regenerate
       // `element.canvas` on rerenders
@@ -956,6 +958,9 @@ export const getElementShape = <Point extends GlobalPoint | LocalPoint>(
         pointFrom(cx, cy),
         shouldTestInside(element),
       );
+    }
+    case "spray": {
+      return [] as any;
     }
   }
 };

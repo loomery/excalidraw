@@ -49,6 +49,8 @@ export const distanceToElement = (
     case "arrow":
     case "freedraw":
       return distanceToLinearOrFreeDraElement(element, p);
+    case "spray":
+      return Infinity;
   }
 };
 
