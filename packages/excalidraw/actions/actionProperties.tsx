@@ -729,6 +729,48 @@ export const actionChangeFontSize = register({
   },
   PanelComponent: ({ elements, appState, updateData, app, data }) => {
     const { isCompact } = getStylesPanelInfo(app);
+    const rangeRef = useRef<HTMLInputElement>(null);
+    const valueRef = useRef<HTMLDivElement>(null);
+
+    const currentFontSize = getFormValue(
+      elements,
+      app,
+      (element) => {
+        if (isTextElement(element)) {
+          return element.fontSize;
+        }
+        const boundTextElement = getBoundTextElement(
+          element,
+          app.scene.getNonDeletedElementsMap(),
+        );
+        if (boundTextElement) {
+          return boundTextElement.fontSize;
+        }
+        return null;
+      },
+      (element) =>
+        isTextElement(element) ||
+        getBoundTextElement(element, app.scene.getNonDeletedElementsMap()) !==
+          null,
+      (hasSelection) =>
+        hasSelection ? null : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+    );
+
+    useEffect(() => {
+      if (rangeRef.current && valueRef.current && currentFontSize !== null) {
+        const rangeElement = rangeRef.current;
+        const valueElement = valueRef.current;
+        const inputWidth = rangeElement.offsetWidth;
+        const thumbWidth = 15;
+        const min = 4;
+        const max = 96;
+        const normalizedValue = ((currentFontSize - min) / (max - min)) * 100;
+        const position =
+          (normalizedValue / 100) * (inputWidth - thumbWidth) + thumbWidth / 2;
+        valueElement.style.left = `${position}px`;
+        rangeElement.style.background = `linear-gradient(to right, var(--color-slider-track) 0%, var(--color-slider-track) ${normalizedValue}%, var(--button-bg) ${normalizedValue}%, var(--button-bg) 100%)`;
+      }
+    }, [currentFontSize]);
 
     return (
       <fieldset>
@@ -762,33 +804,7 @@ export const actionChangeFontSize = register({
                 testId: "fontSize-veryLarge",
               },
             ]}
-            value={getFormValue(
-              elements,
-              app,
-              (element) => {
-                if (isTextElement(element)) {
-                  return element.fontSize;
-                }
-                const boundTextElement = getBoundTextElement(
-                  element,
-                  app.scene.getNonDeletedElementsMap(),
-                );
-                if (boundTextElement) {
-                  return boundTextElement.fontSize;
-                }
-                return null;
-              },
-              (element) =>
-                isTextElement(element) ||
-                getBoundTextElement(
-                  element,
-                  app.scene.getNonDeletedElementsMap(),
-                ) !== null,
-              (hasSelection) =>
-                hasSelection
-                  ? null
-                  : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
-            )}
+            value={currentFontSize}
             onChange={(value) => {
               withCaretPositionPreservation(
                 () => updateData(value),
@@ -798,6 +814,29 @@ export const actionChangeFontSize = register({
               );
             }}
           />
+        </div>
+        <div className="range-wrapper" style={{ marginTop: "8px" }}>
+          <input
+            ref={rangeRef}
+            type="range"
+            min="4"
+            max="96"
+            step="1"
+            onChange={(event) => {
+              withCaretPositionPreservation(
+                () => updateData(+event.target.value),
+                isCompact,
+                !!appState.editingTextElement,
+                data?.onPreventClose,
+              );
+            }}
+            value={currentFontSize ?? DEFAULT_FONT_SIZE}
+            className="range-input"
+            data-testid="fontSize-slider"
+          />
+          <div className="value-bubble" ref={valueRef}>
+            {currentFontSize ?? DEFAULT_FONT_SIZE}
+          </div>
         </div>
       </fieldset>
     );
