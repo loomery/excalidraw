@@ -107,6 +107,7 @@ import {
   FontSizeMediumIcon,
   FontSizeLargeIcon,
   FontSizeExtraLargeIcon,
+  FontSizeXXLIcon,
   EdgeSharpIcon,
   EdgeRoundIcon,
   TextAlignLeftIcon,
@@ -760,6 +761,12 @@ export const actionChangeFontSize = register({
                 text: t("labels.veryLarge"),
                 icon: FontSizeExtraLargeIcon,
                 testId: "fontSize-veryLarge",
+              },
+              {
+                value: 48,
+                text: t("labels.xxLarge"),
+                icon: FontSizeXXLIcon,
+                testId: "fontSize-xxLarge",
               },
             ]}
             value={getFormValue(
